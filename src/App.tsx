@@ -15,8 +15,12 @@ import {
   addDoc, 
   Timestamp, 
   getDocs,
-  limit
+  limit,
+  writeBatch,
+  deleteDoc,
+  doc as firestoreDoc
 } from 'firebase/firestore';
+import { subDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
@@ -38,6 +42,35 @@ export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
+  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('all');
+
+  const filteredTransactions = transactions.filter(t => {
+    if (dateRange === 'all') return true;
+    const tDate = new Date(t.date);
+    const now = new Date();
+    const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
+    return isAfter(tDate, subDays(now, days));
+  });
+
+  const clearAllTransactions = async () => {
+    if (!user) return;
+    if (!window.confirm("Are you sure you want to clear all transaction data? This cannot be undone.")) return;
+
+    try {
+      const q = query(collection(db, 'transactions'), where('userId', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      const batch = writeBatch(db);
+      querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setTransactions([]);
+      alert("All transactions cleared successfully.");
+    } catch (err) {
+      console.error("Error clearing transactions:", err);
+      alert("Failed to clear transactions.");
+    }
+  };
 
   useEffect(() => {
     if (userProfile?.darkMode) {
@@ -241,10 +274,10 @@ export default function App() {
       setActiveTab={setActiveTab} 
       healthScore={insightsData.healthScore}
     >
-      {activeTab === 'dashboard' && <Dashboard transactions={transactions} userProfile={userProfile} />}
+      {activeTab === 'dashboard' && <Dashboard transactions={filteredTransactions} userProfile={userProfile} dateRange={dateRange} setDateRange={setDateRange} />}
       {activeTab === 'transactions' && (
         <Transactions 
-          transactions={transactions} 
+          transactions={filteredTransactions} 
           onUpload={handleUpload} 
           isUploading={isUploading} 
         />
@@ -256,7 +289,7 @@ export default function App() {
           healthScore={insightsData.healthScore} 
         />
       )}
-      {activeTab === 'chat' && <Chat transactions={transactions} />}
+      {activeTab === 'chat' && <Chat transactions={filteredTransactions} />}
       {activeTab === 'upload' && (
         <UploadStatement onUpload={handleUpload} isUploading={isUploading} />
       )}
@@ -290,6 +323,16 @@ export default function App() {
                   className={`w-10 h-5 rounded-full relative transition-colors duration-200 ${userProfile?.darkMode ? 'bg-accent' : 'bg-slate-200 dark:bg-slate-700'}`}
                 >
                    <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-200 ${userProfile?.darkMode ? 'left-5.5' : 'left-0.5'}`}></div>
+                </button>
+             </div>
+             
+             <div className="pt-8 mt-8 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs font-bold text-danger uppercase tracking-widest mb-4">Danger Zone</p>
+                <button 
+                  onClick={clearAllTransactions}
+                  className="w-full py-4 bg-danger/10 hover:bg-danger text-danger hover:text-white rounded-2xl border border-danger/20 font-bold transition-all text-sm"
+                >
+                  Clear All Transaction Data
                 </button>
              </div>
           </div>

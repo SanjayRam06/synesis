@@ -10,6 +10,8 @@ import { format } from 'date-fns';
 interface DashboardProps {
   transactions: Transaction[];
   userProfile?: UserProfile | null;
+  dateRange: '7d' | '30d' | '90d' | 'all';
+  setDateRange: (range: '7d' | '30d' | '90d' | 'all') => void;
 }
 
 const COLORS = [
@@ -78,6 +80,31 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
 
   return (
     <div className="space-y-8 text-left">
+      {/* Date Filter */}
+      <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center gap-2">
+           <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
+              <TrendingUp size={16} className="text-accent" />
+           </div>
+           <p className="text-sm font-bold text-slate-800 dark:text-white">Time Range</p>
+        </div>
+        <div className="flex gap-1 p-1 bg-slate-50 dark:bg-slate-800 rounded-xl">
+          {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+            <button
+              key={range}
+              onClick={() => setDateRange(range)}
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                dateRange === range 
+                  ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md' 
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+              }`}
+            >
+              {range === 'all' ? 'All Time' : range.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: 'Total Balance', value: `₹${totalBalance.toLocaleString()}`, color: 'text-slate-900 dark:text-white', icon: <DollarSign size={14} className="text-slate-400" /> },

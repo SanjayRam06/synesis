@@ -38,7 +38,7 @@ async function startServer() {
       }
 
       const model = genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.0-flash',
         generationConfig: { responseMimeType: 'application/json' }
       });
       
@@ -62,7 +62,7 @@ async function startServer() {
   app.post('/api/analyze', async (req, res) => {
     try {
       const { transactions } = req.body;
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const prompt = `Analyze these transactions and provide 3 insights, 1 prediction, and a health score (0-100) in JSON: { insights: string[], prediction: string, healthScore: number }. Data: ${JSON.stringify(transactions)}`;
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -76,7 +76,7 @@ async function startServer() {
   app.post('/api/chat', async (req, res) => {
     try {
       const { prompt, context } = req.body;
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const fullPrompt = `You are Synesis AI. Context: ${context}. Question: ${prompt}`;
       const result = await model.generateContent(fullPrompt);
       res.json({ response: (await result.response).text() });

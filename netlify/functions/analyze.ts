@@ -9,7 +9,7 @@ export const handler: Handler = async (event) => {
     if (!apiKey) return { statusCode: 500, body: JSON.stringify({ error: 'API Key missing' }) };
     
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const prompt = `Analyze: ${JSON.stringify(transactions)}. Provide insights, prediction, healthScore in JSON.`;
     const result = await model.generateContent(prompt);
     

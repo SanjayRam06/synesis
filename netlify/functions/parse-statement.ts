@@ -1,52 +1,28 @@
 import { Handler } from '@netlify/functions';
 import * as pdf from 'pdf-parse';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import busboy from 'busboy';
+import parser from 'lambda-multipart-parser';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export const handler: Handler = async (event) => {
-  console.log('Netlify Function: parse-statement started');
-  
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   try {
-    const contentType = event.headers['content-type'] || event.headers['Content-Type'];
-    if (!contentType) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Missing Content-Type header' }) };
+    console.log('Function started. Parsing multipart body...');
+    const result = await parser.parse(event);
+    
+    if (!result.files || result.files.length === 0) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'No file found in request' }) };
     }
 
-    console.log('Parsing multipart data...');
-    const { fileBuffer, fileName } = await new Promise<{fileBuffer: Buffer | null, fileName: string}>((resolve, reject) => {
-      const bb = busboy({ headers: event.headers });
-      let buffer: Buffer | null = null;
-      let name = '';
+    const file = result.files[0];
+    const fileBuffer = file.content;
+    const fileName = file.filename;
 
-      bb.on('file', (fieldname, file, info) => {
-        const { filename } = info;
-        name = filename;
-        const chunks: any[] = [];
-        file.on('data', (data) => chunks.push(data));
-        file.on('end', () => {
-          buffer = Buffer.concat(chunks);
-        });
-      });
-
-      bb.on('finish', () => resolve({ fileBuffer: buffer, fileName: name }));
-      bb.on('error', (err) => reject(err));
-
-      const body = event.isBase64Encoded ? Buffer.from(event.body!, 'base64') : Buffer.from(event.body!);
-      bb.end(body);
-    });
-
-    if (!fileBuffer) {
-      console.error('No file buffer found after parsing');
-      return { statusCode: 400, body: JSON.stringify({ error: 'No file found in the request' }) };
-    }
-
-    console.log(`Processing file: ${fileName}, size: ${fileBuffer.length} bytes`);
+    console.log(`File received: ${fileName}, size: ${fileBuffer.length} bytes`);
 
     let text = '';
     const isCSV = fileName.toLowerCase().endsWith('.csv');
@@ -54,49 +30,40 @@ export const handler: Handler = async (event) => {
     if (isCSV) {
       text = fileBuffer.toString('utf-8');
     } else {
-      console.log('Parsing PDF text...');
+      console.log('Parsing PDF...');
       const pdfParser = (pdf as any).default || (pdf as any).PDFParse || pdf;
       const data = await pdfParser(fileBuffer);
       text = data.text;
     }
 
     if (!text || text.trim().length === 0) {
-      return { statusCode: 422, body: JSON.stringify({ error: 'Selected file has no readable text.' }) };
+      return { statusCode: 422, body: JSON.stringify({ error: 'Could not read any text from the file.' }) };
     }
 
-    console.log('Calling Gemini AI...');
     if (!process.env.GEMINI_API_KEY) {
-       return { statusCode: 500, body: JSON.stringify({ error: 'GEMINI_API_KEY is not configured in Netlify' }) };
+      return { statusCode: 500, body: JSON.stringify({ error: 'GEMINI_API_KEY is not set in Netlify Environment Variables.' }) };
     }
 
+    console.log('Calling Gemini...');
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-1.5-flash',
       generationConfig: { responseMimeType: 'application/json' }
     });
     
-    const prompt = `
-      Extract transaction records from this ${isCSV ? 'CSV' : 'PDF'} bank statement.
-      Return ONLY a JSON object with a key "transactions" which is an array of objects.
-      Each object MUST have: date (YYYY-MM-DD), merchant, amount (number), type (debit/credit), category, and originalText.
-      Categories: [Food, Transport, Shopping, Bills, Entertainment, Health, Investment, Income, Others]
-      Text: ${text.substring(0, 30000)}
-    `;
+    const prompt = `Extract all transactions from this bank statement text. Return JSON: { "transactions": [...] }. Each object: { date: "YYYY-MM-DD", merchant: string, amount: number, type: "debit"|"credit", category: string, originalText: string }. Text: ${text.substring(0, 30000)}`;
 
     const aiResult = await model.generateContent(prompt);
     const response = await aiResult.response;
-    const transactions = JSON.parse(response.text()).transactions || [];
-
-    console.log(`Successfully parsed ${transactions.length} transactions`);
+    
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transactions })
+      body: response.text()
     };
   } catch (error: any) {
-    console.error('Netlify Function Error:', error);
+    console.error('Function Crash:', error);
     return { 
       statusCode: 500, 
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: error.message || 'Internal Server Error' }) 
     };
   }

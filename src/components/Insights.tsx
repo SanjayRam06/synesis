@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Brain, Target, ShieldCheck } from 'lucide-react';
+import { Lightbulb, TrendingUp, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface InsightsProps {
@@ -10,87 +10,93 @@ interface InsightsProps {
 
 export default function Insights({ insights, prediction, healthScore }: InsightsProps) {
   return (
-    <div className="space-y-8">
-      <header>
-        <h2 className="text-3xl font-bold tracking-tight text-primary">AI Insights</h2>
-        <p className="text-secondary mt-1">Personalized financial advice powered by Gemini.</p>
-      </header>
+    <div className="space-y-8 text-left">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm col-span-2"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+              <Lightbulb className="text-amber-500" size={20} />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest">Smart Insights</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {insights.map((insight, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700"
+              >
+                <div className="w-1.5 h-1.5 bg-accent rounded-full mt-2 shrink-0" />
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">{insight}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Health Score */}
-        <div className="lg:col-span-1 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-          <div className="relative w-40 h-40 flex items-center justify-center mb-6">
-            <svg className="w-full h-full -rotate-90">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="transparent"
-                stroke="#f1f5f9"
-                strokeWidth="12"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                fill="transparent"
-                stroke="#3b82f6"
-                strokeWidth="12"
-                strokeDasharray={440}
-                strokeDashoffset={440 - (440 * healthScore) / 100}
-                strokeLinecap="round"
-                className="transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center">
-              <span className="text-4xl font-bold text-primary">{healthScore}</span>
-              <span className="text-xs text-secondary font-medium uppercase tracking-wider">Score</span>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-accent p-8 rounded-[2.5rem] shadow-xl shadow-accent/20 flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2 bg-white/20 rounded-xl">
+                <TrendingUp className="text-white" size={20} />
+              </div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-widest opacity-80">AI Prediction</h3>
+            </div>
+            <p className="text-lg text-white font-medium leading-relaxed italic">"{prediction}"</p>
+          </div>
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <p className="text-[10px] text-white/60 font-bold uppercase tracking-wider mb-2">Confidence Level</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full bg-white w-[92%]"></div>
+              </div>
+              <span className="text-xs font-bold text-white">92%</span>
             </div>
           </div>
-          <p className="text-secondary text-sm">Your financial health is {healthScore > 80 ? 'Excellent' : healthScore > 50 ? 'Good' : 'Needs Work'}.</p>
-        </div>
+        </motion.div>
+      </div>
 
-        {/* Prediction */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-2xl text-white shadow-xl flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                <Brain size={24} />
-              </div>
-              <h3 className="text-xl font-bold">Predictive Forecast</h3>
-            </div>
-            <p className="text-lg text-blue-50 leading-relaxed italic">
-              " {prediction} "
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4 }}
+        className="bg-emerald-500 p-10 rounded-[3rem] shadow-xl shadow-emerald-500/20 relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-700">
+           <ShieldCheck size={200} />
+        </div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+          <div className="text-center md:text-left flex-1">
+            <h3 className="text-white font-bold text-4xl mb-4">Your Financial Health</h3>
+            <p className="text-emerald-100 text-lg max-w-xl">
+              Based on your recent transactions, your spending profile is looking robust. Keep it up to reach your savings goals!
             </p>
           </div>
-          <div className="mt-8 flex items-center gap-2 text-sm text-blue-100">
-            <ShieldCheck size={16} />
-            <span>Based on your recent spending habits.</span>
+          <div className="relative">
+            <svg className="w-48 h-48">
+              <circle cx="96" cy="96" r="88" stroke="rgba(255,255,255,0.1)" strokeWidth="16" fill="transparent" />
+              <circle cx="96" cy="96" r="88" stroke="white" strokeWidth="16" fill="transparent" 
+                strokeDasharray="552" strokeDashoffset={552 - (552 * healthScore) / 100}
+                strokeLinecap="round" className="transition-all duration-1000" />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-5xl font-light text-white">{healthScore}</span>
+              <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Score</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {insights.map((insight, idx) => (
-          <motion.div 
-            key={idx}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: idx * 0.1 }}
-            className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4 hover:border-accent hover:shadow-md transition-all group"
-          >
-            <div className="p-2.5 bg-accent/10 text-accent rounded-xl group-hover:bg-accent group-hover:text-white transition-colors">
-              <Sparkles size={20} />
-            </div>
-            <p className="text-sm font-medium text-gray-700 leading-relaxed">{insight}</p>
-          </motion.div>
-        ))}
-        {insights.length === 0 && (
-          <div className="col-span-3 p-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-            <p className="text-secondary">Upload transactions to unlock AI insights.</p>
-          </div>
-        )}
-      </div>
+      </motion.div>
     </div>
   );
 }

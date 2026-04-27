@@ -35,7 +35,7 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-export default function Dashboard({ transactions, userProfile }: DashboardProps) {
+export default function Dashboard({ transactions, userProfile, dateRange, setDateRange }: DashboardProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const totalBalance = transactions.reduce((acc, t) => acc + (t.type === 'credit' ? t.amount : -t.amount), 0);
@@ -80,13 +80,12 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
 
   return (
     <div className="space-y-8 text-left">
-      {/* Date Filter */}
       <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-2">
            <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
               <TrendingUp size={16} className="text-accent" />
            </div>
-           <p className="text-sm font-bold text-slate-800 dark:text-white">Time Range</p>
+           <p className="text-sm font-bold text-slate-800 dark:text-white">Time Range Filter</p>
         </div>
         <div className="flex gap-1 p-1 bg-slate-50 dark:bg-slate-800 rounded-xl">
           {(['7d', '30d', '90d', 'all'] as const).map((range) => (
@@ -177,7 +176,7 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
                   outerRadius={110} 
                   paddingAngle={5} 
                   dataKey="value"
-                  onMouseEnter={(_, index) => setActiveIndex(index)}
+                  onMouseEnter={((_: any, index: number) => setActiveIndex(index)) as any}
                 >
                   {categoryData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

@@ -157,7 +157,8 @@ export default function App() {
       const data = await res.json();
       
       if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
+        console.error("Server responded with error:", data);
+        throw new Error(data.error || `Server error: ${res.status}`);
       }
       
       const parsedTransactions = data.transactions;

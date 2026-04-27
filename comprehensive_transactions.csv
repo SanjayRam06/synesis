@@ -1,0 +1,31 @@
+Date,Merchant,Amount,Type,Category
+2026-04-01,Amazon India,2499,debit,Online Shopping
+2026-04-02,Flipkart,1250,debit,Online Shopping
+2026-04-03,Zomato,450,debit,Food & Dining
+2026-04-04,Jio Recharge,666,debit,Bills & Recharges
+2026-04-05,Salary Credit,85000,credit,Income
+2026-04-06,Uber India,320,debit,Travel
+2026-04-07,Apollo Pharmacy,850,debit,Health & Wellness
+2026-04-08,Netflix India,499,debit,Entertainment
+2026-04-09,UPI Transfer - Ramesh,2500,debit,Peer-to-Peer
+2026-04-10,Myntra,3200,debit,Online Shopping
+2026-04-11,Swiggy,580,debit,Food & Dining
+2026-04-12,Electricity Bill,4200,debit,Bills & Recharges
+2026-04-13,Zerodha Investment,10000,debit,Investments
+2026-04-14,Ola Cabs,450,debit,Travel
+2026-04-15,BookMyShow,800,debit,Entertainment
+2026-04-16,Airtel Broadband,1180,debit,Bills & Recharges
+2026-04-17,UPI Transfer - Suresh,1200,debit,Peer-to-Peer
+2026-04-18,Grofers/Blinkit,1450,debit,Food & Dining
+2026-04-19,Groww Mutual Fund,5000,debit,Investments
+2026-04-20,Local Grocery,400,debit,Others
+2026-04-21,Amazon Cloud,800,debit,Bills & Recharges
+2026-04-22,IndiGo Airlines,6500,debit,Travel
+2026-04-23,Gym Membership,2000,debit,Health & Wellness
+2026-04-24,Spotify,119,debit,Entertainment
+2026-04-25,UPI from Priya,3000,credit,Income
+2026-04-26,Starbucks Coffee,350,debit,Food & Dining
+2026-04-27,Apple Store,9900,debit,Online Shopping
+2026-04-28,Gas Cylinder,1100,debit,Bills & Recharges
+2026-04-29,UPI Transfer - Mom,5000,debit,Peer-to-Peer
+2026-04-30,Mutual Fund Div,500,credit,Income

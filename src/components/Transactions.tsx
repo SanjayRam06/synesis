@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Transaction } from '../types';
-import { Search, ArrowUpRight, ArrowDownLeft, FileText } from 'lucide-react';
+import { Search, ArrowUpRight, ArrowDownLeft, FileText, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -8,9 +8,10 @@ interface TransactionsProps {
   transactions: Transaction[];
   onUpload: (file: File) => Promise<void>;
   isUploading: boolean;
+  onClearAll: () => Promise<void>;
 }
 
-export default function Transactions({ transactions, onUpload, isUploading }: TransactionsProps) {
+export default function Transactions({ transactions, onUpload, isUploading, onClearAll }: TransactionsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'debit' | 'credit'>('all');
 
@@ -34,20 +35,33 @@ export default function Transactions({ transactions, onUpload, isUploading }: Tr
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex gap-1 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[1.25rem] shadow-sm">
-          {(['all', 'debit', 'credit'] as const).map((type) => (
+        <div className="flex gap-4 items-center">
+          <div className="flex gap-1 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[1.25rem] shadow-sm">
+            {(['all', 'debit', 'credit'] as const).map((type) => (
+              <button
+                key={type}
+                onClick={() => setFilterType(type)}
+                className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                  filterType === type 
+                    ? 'bg-slate-900 dark:bg-accent text-white shadow-md' 
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+          
+          {transactions.length > 0 && (
             <button
-              key={type}
-              onClick={() => setFilterType(type)}
-              className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                filterType === type 
-                  ? 'bg-slate-900 dark:bg-accent text-white shadow-md' 
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
-              }`}
+              onClick={onClearAll}
+              className="p-3 bg-danger/10 hover:bg-danger text-danger hover:text-white rounded-xl transition-all shadow-sm flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-danger/20"
+              title="Clear All Transactions"
             >
-              {type}
+              <Trash2 size={16} />
+              <span className="hidden md:inline">Clear All</span>
             </button>
-          ))}
+          )}
         </div>
       </div>
 

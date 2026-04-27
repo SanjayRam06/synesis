@@ -236,6 +236,7 @@ export default function App() {
           transactions={filteredTransactions} 
           onUpload={handleUpload} 
           isUploading={isUploading} 
+          onClearAll={clearAllTransactions}
         />
       )}
       {activeTab === 'insights' && (

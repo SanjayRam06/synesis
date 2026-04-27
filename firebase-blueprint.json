@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User specific data and settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "onboarded": { "type": "boolean" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Transaction": {
+      "title": "Financial Transaction",
+      "description": "A single transaction record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["debit", "credit"] },
+        "merchant": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "originalText": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "type", "date"]
+    },
+    "Budget": {
+      "title": "Category Budget",
+      "description": "Monthly budget limit for a category",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "category": { "type": "string" },
+        "limit": { "type": "number" },
+        "month": { "type": "string" },
+        "year": { "type": "number" }
+      },
+      "required": ["userId", "category", "limit", "month", "year"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Financial transactions"
+    },
+    "/budgets/{budgetId}": {
+      "schema": "Budget",
+      "description": "User budgets"
+    }
+  }
+}

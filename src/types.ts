@@ -29,6 +29,8 @@ export interface UserProfile {
   onboarded?: boolean;
   upiLinked?: boolean;
   linkedVpa?: string;
+  darkMode?: boolean;
+  emailNotifications?: boolean;
 }
 
 export const CATEGORIES = [

@@ -40,6 +40,28 @@ export default function App() {
   const [isLinking, setIsLinking] = useState(false);
 
   useEffect(() => {
+    if (userProfile?.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [userProfile?.darkMode]);
+
+  const toggleDarkMode = async () => {
+    if (!user) return;
+    const newMode = !userProfile?.darkMode;
+    await setDoc(doc(db, 'users', user.uid), { darkMode: newMode }, { merge: true });
+    setUserProfile(prev => prev ? { ...prev, darkMode: newMode } : null);
+  };
+
+  const toggleEmailNotifications = async () => {
+    if (!user) return;
+    const newMode = !userProfile?.emailNotifications;
+    await setDoc(doc(db, 'users', user.uid), { emailNotifications: newMode }, { merge: true });
+    setUserProfile(prev => prev ? { ...prev, emailNotifications: newMode } : null);
+  };
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
@@ -242,27 +264,33 @@ export default function App() {
         <UPILink onLink={handleLinkUPI} isLinking={isLinking} linkedVpa={userProfile?.linkedVpa} />
       )}
       {activeTab === 'settings' && (
-        <div className="p-12 bg-white rounded-[2rem] border border-slate-200 shadow-sm text-center">
-          <h3 className="text-2xl font-bold mb-4 text-slate-800">Settings</h3>
-          <p className="text-slate-500 mb-8">Personalize your Synesis experience.</p>
+        <div className="p-12 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+          <h3 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Settings</h3>
+          <p className="text-slate-500 dark:text-slate-400 mb-8">Personalize your Synesis experience.</p>
           <div className="max-w-md mx-auto space-y-4">
-             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center text-left">
+             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center text-left">
                 <div>
-                   <p className="font-bold text-slate-800">Email Notifications</p>
-                   <p className="text-xs text-slate-500">Weekly spending summaries</p>
+                   <p className="font-bold text-slate-800 dark:text-white">Email Notifications</p>
+                   <p className="text-xs text-slate-500 dark:text-slate-400">Weekly spending summaries</p>
                 </div>
-                <div className="w-10 h-5 bg-slate-200 rounded-full relative">
-                   <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
-                </div>
+                <button 
+                  onClick={toggleEmailNotifications}
+                  className={`w-10 h-5 rounded-full relative transition-colors duration-200 ${userProfile?.emailNotifications ? 'bg-accent' : 'bg-slate-200 dark:bg-slate-700'}`}
+                >
+                   <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-200 ${userProfile?.emailNotifications ? 'left-5.5' : 'left-0.5'}`}></div>
+                </button>
              </div>
-             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center text-left">
+             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center text-left">
                 <div>
-                   <p className="font-bold text-slate-800">Dark Mode</p>
-                   <p className="text-xs text-slate-500">Easier on the eyes</p>
+                   <p className="font-bold text-slate-800 dark:text-white">Dark Mode</p>
+                   <p className="text-xs text-slate-500 dark:text-slate-400">Easier on the eyes</p>
                 </div>
-                <div className="w-10 h-5 bg-slate-200 rounded-full relative">
-                   <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
-                </div>
+                <button 
+                  onClick={toggleDarkMode}
+                  className={`w-10 h-5 rounded-full relative transition-colors duration-200 ${userProfile?.darkMode ? 'bg-accent' : 'bg-slate-200 dark:bg-slate-700'}`}
+                >
+                   <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-200 ${userProfile?.darkMode ? 'left-5.5' : 'left-0.5'}`}></div>
+                </button>
              </div>
           </div>
         </div>

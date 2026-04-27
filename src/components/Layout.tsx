@@ -24,15 +24,15 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
   ];
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-background text-slate-900 dark:text-slate-100 overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
         <div className="p-8">
           <div className="flex items-center gap-2 mb-10">
             <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20">
               <Wallet className="text-white" size={20} />
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-800">Synesis</span>
+            <span className="font-bold text-xl tracking-tight text-slate-800 dark:text-white">Synesis</span>
           </div>
 
           <nav className="space-y-1">
@@ -42,8 +42,8 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all font-medium text-sm ${
                   activeTab === item.id
-                    ? 'bg-slate-100 text-accent'
-                    : 'text-secondary hover:text-slate-800 hover:bg-slate-50'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-accent'
+                    : 'text-secondary dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <item.icon size={18} />
@@ -53,25 +53,25 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
           </nav>
         </div>
 
-        <div className="mt-auto p-8 border-t border-slate-100 space-y-6">
-          <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+        <div className="mt-auto p-8 border-t border-slate-100 dark:border-slate-800 space-y-6">
+          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
             <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-1">AI Engine v2.4</p>
-            <p className="text-xs text-indigo-900 font-medium leading-tight text-left">Get advanced predictions</p>
+            <p className="text-xs text-indigo-900 dark:text-indigo-200 font-medium leading-tight text-left">Get advanced predictions</p>
           </div>
 
           <div className="flex items-center gap-3 group px-2">
             {user?.photoURL ? (
               <img src={user.photoURL} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-white shadow-sm" />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border-2 border-white shadow-sm text-sm">
+              <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold border-2 border-white dark:border-slate-700 shadow-sm text-sm">
                 {user?.email?.charAt(0).toUpperCase()}
               </div>
             )}
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-800 truncate">{user?.displayName || 'Active User'}</p>
+              <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{user?.displayName || 'Active User'}</p>
               <button 
                 onClick={() => auth.signOut()}
-                className="text-[10px] text-slate-400 font-medium hover:text-danger flex items-center gap-1 transition-colors"
+                className="text-[10px] text-slate-400 dark:text-slate-500 font-medium hover:text-danger flex items-center gap-1 transition-colors"
               >
                 Sign out <LogOut size={10} />
               </button>
@@ -81,22 +81,22 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative">
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-10 flex items-center justify-between sticky top-0 z-10">
-          <h1 className="text-lg font-bold text-slate-800 capitalize">
+      <main className="flex-1 overflow-y-auto relative bg-background">
+        <header className="h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-10 flex items-center justify-between sticky top-0 z-10">
+          <h1 className="text-lg font-bold text-slate-800 dark:text-white capitalize">
             {activeTab.replace('-', ' ')}
           </h1>
           <div className="flex items-center gap-6">
              <div className="text-right">
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Health Score</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Health Score</p>
                 <div className="flex items-center gap-2">
-                   <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                   <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
                         className={`h-full transition-all duration-1000 ${healthScore > 70 ? 'bg-emerald-500' : healthScore > 40 ? 'bg-amber-500' : 'bg-danger'}`} 
                         style={{ width: `${healthScore}%` }}
                       ></div>
                    </div>
-                   <span className="text-xs font-bold text-slate-700">{healthScore}%</span>
+                   <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{healthScore}%</span>
                 </div>
              </div>
           </div>

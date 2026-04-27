@@ -33,13 +33,15 @@ export const handler: Handler = async (event) => {
       try {
         const { GoogleGenerativeAI } = await import('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Using flash-lite as it often has higher free tier quotas
         const model = genAI.getGenerativeModel({ 
           model: 'gemini-2.0-flash-lite',
           generationConfig: { responseMimeType: 'application/json' }
         });
         
-        const prompt = `Extract transactions from this text. Return JSON: { "transactions": [...] }. Text: ${text.substring(0, 20000)}`;
+        const prompt = `Extract transactions from this text. 
+        Categories: [Online Shopping, Bills & Recharges, Peer-to-Peer, Food & Dining, Travel, Health & Wellness, Entertainment, Investments, Others, Income]
+        Return JSON: { "transactions": [...] }. Text: ${text.substring(0, 20000)}`;
+        
         const aiResult = await model.generateContent(prompt);
         return {
           statusCode: 200,
@@ -47,13 +49,11 @@ export const handler: Handler = async (event) => {
           body: aiResult.response.text()
         };
       } catch (aiError: any) {
-        console.error('Gemini AI Error (falling back to mock):', aiError.message);
-        // If it's a quota or 429 error, we continue to mock below
+        console.error('Gemini AI Error:', aiError.message);
       }
     }
 
-    // FALLBACK: Mock/Basic CSV Parsing (to ensure app still works)
-    console.log('Using Fallback Parsing Logic...');
+    // Fallback Mock Logic with new categories
     let transactions = [];
     if (isCSV) {
       const lines = text.split('\n').filter(l => l.trim().length > 0).slice(1);
@@ -68,16 +68,12 @@ export const handler: Handler = async (event) => {
           originalText: line.substring(0, 50)
         };
       });
-    } else {
-      transactions = [
-        { date: '2026-04-01', merchant: 'Sample Store', amount: 100, type: 'debit', category: 'Shopping', originalText: 'Mock Data' }
-      ];
     }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transactions, note: "Using fallback parser due to AI quota limits." })
+      body: JSON.stringify({ transactions })
     };
 
   } catch (error: any) {

@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart as RePie, Pie, Cell, Legend
 } from 'recharts';
-import { DollarSign, Smartphone, CheckCircle2 } from 'lucide-react';
+import { DollarSign, Smartphone, CheckCircle2, ListFilter } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface DashboardProps {
@@ -12,7 +12,6 @@ interface DashboardProps {
   userProfile?: UserProfile | null;
 }
 
-// More vibrant and wide range of colors
 const COLORS = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', 
   '#ef4444', '#f97316', '#f59e0b', '#10b981', 
@@ -24,6 +23,7 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
   const totalIncome = transactions.filter(t => t.type === 'credit').reduce((acc, t) => acc + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === 'debit').reduce((acc, t) => acc + t.amount, 0);
 
+  // Category data for Pie Chart
   const categoryData = transactions
     .filter(t => t.type === 'debit')
     .reduce((acc: any[], t) => {
@@ -31,8 +31,9 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
       const existing = acc.find(item => item.name === catName);
       if (existing) {
         existing.value += t.amount;
+        existing.count += 1;
       } else {
-        acc.push({ name: catName, value: t.amount });
+        acc.push({ name: catName, value: t.amount, count: 1 });
       }
       return acc;
     }, [])
@@ -61,6 +62,7 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
 
   return (
     <div className="space-y-8 text-left">
+      {/* Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: 'Total Balance', value: `₹${totalBalance.toLocaleString()}`, color: 'text-slate-900 dark:text-white', icon: <DollarSign size={14} className="text-slate-400" /> },
@@ -99,6 +101,7 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
         </div>
       </div>
 
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest mb-8 text-left">Cash Flow</h3>
@@ -150,6 +153,68 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
               </RePie>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      {/* DETAILED CATEGORY TABLE */}
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center gap-3 mb-8">
+           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
+              <ListFilter className="text-accent" size={20} />
+           </div>
+           <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest">Category Segregation</h3>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 dark:border-slate-800">
+                <th className="pb-4 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Category Section</th>
+                <th className="pb-4 font-bold text-slate-400 uppercase text-[10px] tracking-widest">Transactions</th>
+                <th className="pb-4 font-bold text-slate-400 uppercase text-[10px] tracking-widest text-right">Total Spent</th>
+                <th className="pb-4 font-bold text-slate-400 uppercase text-[10px] tracking-widest text-right">% of Budget</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+              {categoryData.map((cat, idx) => (
+                <tr key={idx} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-8 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-white">{cat.name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium">Detailed breakdown</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4">
+                    <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-bold">
+                      {cat.count} items
+                    </span>
+                  </td>
+                  <td className="py-4 text-right font-bold text-slate-900 dark:text-white">
+                    ₹{cat.value.toLocaleString()}
+                  </td>
+                  <td className="py-4 text-right">
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs font-bold text-accent">{((cat.value / totalExpense) * 100).toFixed(1)}%</span>
+                      <div className="w-20 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-accent" 
+                          style={{ width: `${(cat.value / totalExpense) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {categoryData.length === 0 && (
+            <div className="py-12 text-center text-slate-400 text-sm italic">
+              No data available for segregation. Upload a statement to get started.
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
-import fs from 'fs';
 import multer from 'multer';
 import * as pdf from 'pdf-parse';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -46,7 +45,7 @@ async function startServer() {
         You are an expert financial analyst. Extract ALL transactions from this ${isCSV ? 'CSV' : 'PDF'} text.
         Return JSON: { "transactions": [...] }
         Each object: { date: "YYYY-MM-DD", merchant: string, amount: number, type: "debit"|"credit", category: string, originalText: string }
-        Categories: [Food, Transport, Shopping, Bills, Entertainment, Health, Investment, Income, Others]
+        Categories: [Online Shopping, Bills & Recharges, Peer-to-Peer, Food & Dining, Travel, Health & Wellness, Entertainment, Investments, Others, Income]
         Text: ${text.substring(0, 30000)}
       `;
 

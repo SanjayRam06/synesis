@@ -1,28 +1,16 @@
-export type TransactionType = 'debit' | 'credit';
-
 export interface Transaction {
   id?: string;
   userId: string;
-  amount: number;
-  type: TransactionType;
-  merchant: string;
-  category: string;
   date: string;
-  originalText?: string;
-  createdAt: string;
-}
-
-export interface Budget {
-  id?: string;
-  userId: string;
+  merchant: string;
+  amount: number;
+  type: 'debit' | 'credit';
   category: string;
-  limit: number;
-  month: string;
-  year: number;
+  originalText: string;
 }
 
 export interface UserProfile {
-  uid: string;
+  id: string;
   email: string;
   displayName?: string;
   photoURL?: string;
@@ -34,13 +22,14 @@ export interface UserProfile {
 }
 
 export const CATEGORIES = [
-  'Food',
-  'Transport',
-  'Shopping',
-  'Bills',
+  'Online Shopping',
+  'Bills & Recharges',
+  'Peer-to-Peer',
+  'Food & Dining',
+  'Travel',
+  'Health & Wellness',
   'Entertainment',
-  'Health',
-  'Investment',
-  'Income',
-  'Others'
+  'Investments',
+  'Others',
+  'Income'
 ];

@@ -2,7 +2,7 @@ import React from 'react';
 import { Transaction, UserProfile } from '../types';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart as RePie, Pie, Cell 
+  PieChart as RePie, Pie, Cell, Legend
 } from 'recharts';
 import { DollarSign, Smartphone, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -12,7 +12,12 @@ interface DashboardProps {
   userProfile?: UserProfile | null;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#64748b'];
+// More vibrant and wide range of colors
+const COLORS = [
+  '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', 
+  '#ef4444', '#f97316', '#f59e0b', '#10b981', 
+  '#06b6d4', '#3b82f6', '#1e293b', '#64748b'
+];
 
 export default function Dashboard({ transactions, userProfile }: DashboardProps) {
   const totalBalance = transactions.reduce((acc, t) => acc + (t.type === 'credit' ? t.amount : -t.amount), 0);
@@ -22,14 +27,16 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
   const categoryData = transactions
     .filter(t => t.type === 'debit')
     .reduce((acc: any[], t) => {
-      const existing = acc.find(item => item.name === t.category);
+      const catName = t.category || 'Others';
+      const existing = acc.find(item => item.name === catName);
       if (existing) {
         existing.value += t.amount;
       } else {
-        acc.push({ name: t.category, value: t.amount });
+        acc.push({ name: catName, value: t.amount });
       }
       return acc;
-    }, []);
+    }, [])
+    .sort((a, b) => b.value - a.value);
 
   const timelineData = transactions.reduce((acc: any[], t) => {
     try {
@@ -53,8 +60,8 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
   }, []).sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+    <div className="space-y-8 text-left">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: 'Total Balance', value: `₹${totalBalance.toLocaleString()}`, color: 'text-slate-900 dark:text-white', icon: <DollarSign size={14} className="text-slate-400" /> },
           { label: 'Income', value: `₹${totalIncome.toLocaleString()}`, color: 'text-emerald-600', badge: 'Monthly', badgeColor: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' },
@@ -70,7 +77,7 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
           </div>
         ))}
 
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group text-left">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4 relative z-10">
             <span className="text-slate-400 dark:text-slate-500 font-medium text-xs uppercase tracking-wider">UPI Account</span>
             <div className={`p-1.5 rounded-lg ${userProfile?.upiLinked ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'bg-slate-50 dark:bg-slate-800'}`}>
@@ -92,35 +99,54 @@ export default function Dashboard({ transactions, userProfile }: DashboardProps)
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest mb-8">Cash Flow</h3>
-          <div className="h-[300px]">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest mb-8 text-left">Cash Flow</h3>
+          <div className="h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={timelineData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:opacity-10" />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} dy={10} />
                 <YAxis hide />
                 <Tooltip 
-                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', background: 'var(--color-slate-900)', color: 'white'}} 
+                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', background: '#1e293b', color: 'white'}} 
                   cursor={{fill: 'transparent'}}
                 />
-                <Bar dataKey="income" fill="var(--color-success)" radius={[4, 4, 0, 0]} barSize={8} />
-                <Bar dataKey="expense" fill="var(--color-danger)" radius={[4, 4, 0, 0]} barSize={8} />
+                <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} barSize={8} />
+                <Bar dataKey="expense" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={8} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest mb-8">Category Split</h3>
-          <div className="h-[300px]">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-widest mb-8 text-left">Category Split</h3>
+          <div className="h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
               <RePie>
-                <Pie data={categoryData} innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
-                  {categoryData.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />)}
+                <Pie 
+                  data={categoryData} 
+                  innerRadius={70} 
+                  outerRadius={100} 
+                  paddingAngle={8} 
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={false}
+                >
+                  {categoryData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />
+                  ))}
                 </Pie>
-                <Tooltip contentStyle={{borderRadius: '16px', border: 'none', background: 'var(--color-slate-900)', color: 'white'}} />
+                <Tooltip 
+                  formatter={(value: number) => `₹${value.toLocaleString()}`}
+                  contentStyle={{borderRadius: '16px', border: 'none', background: '#1e293b', color: 'white', fontSize: '12px'}} 
+                />
+                <Legend 
+                  layout="horizontal" 
+                  verticalAlign="bottom" 
+                  align="center"
+                  wrapperStyle={{ paddingTop: '20px', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}
+                />
               </RePie>
             </ResponsiveContainer>
           </div>

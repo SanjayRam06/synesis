@@ -24,11 +24,11 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
   ];
 
   return (
-    <div className="flex h-screen bg-background text-slate-900 dark:text-slate-100 overflow-hidden">
+    <div className="flex h-screen bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
         <div className="p-8">
-          <div className="flex items-center gap-2 mb-10">
+          <div className="flex items-center gap-2 mb-10 text-left">
             <div className="w-9 h-9 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20">
               <Wallet className="text-white" size={20} />
             </div>
@@ -47,19 +47,19 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
                 }`}
               >
                 <item.icon size={18} />
-                <span>{item.label}</span>
+                <span className="text-left flex-1">{item.label}</span>
               </button>
             ))}
           </nav>
         </div>
 
         <div className="mt-auto p-8 border-t border-slate-100 dark:border-slate-800 space-y-6">
-          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
-            <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-1">AI Engine v2.4</p>
-            <p className="text-xs text-indigo-900 dark:text-indigo-200 font-medium leading-tight text-left">Get advanced predictions</p>
+          <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+            <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-1 text-left">AI Engine v2.4</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-tight text-left">Advanced Predictions</p>
           </div>
 
-          <div className="flex items-center gap-3 group px-2">
+          <div className="flex items-center gap-3 group px-2 text-left">
             {user?.photoURL ? (
               <img src={user.photoURL} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-white shadow-sm" />
             ) : (
@@ -81,8 +81,8 @@ export default function Layout({ children, activeTab, setActiveTab, healthScore 
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative bg-background">
-        <header className="h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-10 flex items-center justify-between sticky top-0 z-10">
+      <main className="flex-1 overflow-y-auto relative bg-[#f8fafc] dark:bg-[#0f172a]">
+        <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-10 flex items-center justify-between sticky top-0 z-10">
           <h1 className="text-lg font-bold text-slate-800 dark:text-white capitalize">
             {activeTab.replace('-', ' ')}
           </h1>
